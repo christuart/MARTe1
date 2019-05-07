@@ -37,11 +37,11 @@ linux/%.o : %.c
 linux/%.a : $(OBJS)
 	touch $@
 	rm linux/$*.a
-	ld -r $(OBJS) -o $@
+	ld $(LFLAGS) -r $(OBJS) -o $@
 
 linux/%.so : linux/%.o $(OBJS)
 #	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
-	$(COMPILER) -shared -fPIC $(OBJS) linux/$*.o $(LIBRARIES) -o $@
+	$(COMPILER) -shared -fPIC -m32 $(OBJS) linux/$*.o $(LIBRARIES) -o $@
 	touch linux/lib$*.so
 	rm  linux/lib$*.so
 	ln -fns $*.so linux/lib$*.so
@@ -59,7 +59,7 @@ linux/%.exe : linux/%.o
 	echo cannot build executable linux/$*.exe use linux/$*.ex
 
 linux/%.ex : linux/%.o $(OBJS)
-	$(COMPILER) linux/$*.o $(OBJS) $(LIBRARIES)  -o linux/$*.ex
+	$(COMPILER) -m32 linux/$*.o $(OBJS) $(LIBRARIES)  -o linux/$*.ex
 
 depends.linux: dependsRaw.linux 
 	sed -f $(MAKEDEFAULTDIR)/CreateLinuxDepends.sed dependsRaw.linux >depends.linux

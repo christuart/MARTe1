@@ -57,15 +57,15 @@ DEBUG = -g -ggdb
 
 OPTIM = 
 
-LFLAGS =  
+LFLAGS = -m elf_i386 
 
-CFLAGS = -fPIC
+CFLAGS = -m32 -fPIC
 
-CPPFLAGS = -fPIC -frtti 
+CPPFLAGS = -m32 -fPIC -frtti 
 
 CFLAGSPEC= -D_LINUX -DUSE_PTHREAD -pthread
 
-LIBRARIES =  
+LIBRARIES = 
 
 .SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam
 
