@@ -27,11 +27,11 @@ ctags : %.cpp %.c %.h
 	ctags -R
 
 linux/%.o : %.cpp
-	$(COMPILER) -c $(OPTIM) $(CFLAGS) $(CPPFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.cpp -o linux/$*.o
+	$(COMPILER) -m32 -c $(OPTIM) $(CFLAGS) $(CPPFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.cpp -o linux/$*.o
 #	$(COMPILER) -S $(OPTIM) $(CFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.cpp -o linux/$*.s
 
 linux/%.o : %.c
-	$(CCOMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c -o linux/$*.o
+	$(CCOMPILER) -m32 -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c -o linux/$*.o
 #	$(COMPILER) -S $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c -o linux/$*.s
 
 linux/%.a : $(OBJS)
@@ -47,11 +47,11 @@ linux/%.so : linux/%.o $(OBJS)
 	ln -fns $*.so linux/lib$*.so
 
 %.ifo :  %.h
-	$(COMPILER) -E -I$(CINTSYSDIR)/src  -I$(CINTSYSDIR) $(CFLAGS) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	$(COMPILER) -m32 -E -I$(CINTSYSDIR)/src  -I$(CINTSYSDIR) $(CFLAGS) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
 	cint  -i temp/temp.pp $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.ifo
 
 %.sinfo.cpp :  %.h
-	$(COMPILER) -D_CINT -E -I$(CINTSYSDIR)/src  -I$(CINTSYSDIR) $(CFLAGS) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	$(COMPILER) -m32 -D_CINT -E -I$(CINTSYSDIR)/src  -I$(CINTSYSDIR) $(CFLAGS) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
 	cint   -i  $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.sinfo.cpp
 
 linux/%.exe : linux/%.o 
@@ -65,15 +65,15 @@ depends.linux: dependsRaw.linux
 	sed -f $(MAKEDEFAULTDIR)/CreateLinuxDepends.sed dependsRaw.linux >depends.linux
 
 dependsRaw.linux: 
-	$(COMPILER) $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.linux
+	$(COMPILER) -m32 $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.linux
 	@mkdir -p temp
 	@mkdir -p linux
 
 linux/%.gam : linux/%.o $(OBJS)
-	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
+	$(COMPILER) -m32 -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
 
 linux/%.drv : linux/%.o $(OBJS)
-	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
+	$(COMPILER) -m32 -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
 
 %.spb : 
 	$(MAKE) -C $* -f Makefile.$(TARGET)
