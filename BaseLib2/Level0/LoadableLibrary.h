@@ -125,7 +125,12 @@ public:
         if (module != 0) Close();
 
         module = dlopen(dllName, RTLD_NOW|RTLD_GLOBAL);
-        if (module==NULL) return False;
+        if (module==NULL) {
+            printf("LoadableLibrary Failed loading %s: %s\n", dllName, dlerror());
+            return False;
+        } else {
+            printf("LoadableLibrary Success openning %s\n", dllName);
+        }
         return True;
 #elif (defined (_WIN32) || defined(_RSXNT))
         if (dllName == NULL) return False;
