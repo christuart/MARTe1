@@ -1,0 +1,44 @@
++UDP_RELAY_SERVER={
+    Class = UDPLoggerReceiver
+    Title = "UDP RELAY LOGGER"
+    Port=32767
+    +UDP_LOGGER_FILE={
+        Title = "UDP FILE LOGGER"
+        Class = UDPLoggerFile
+        MaxNumLogFiles=100
+        MaxNotUsedTimeSecs=3600
+        BaseDir = /tmp
+    }
+    +UDP_LOGGER_RELAY={
+        Title = "UDP LOGGER RELAY"
+        Class = UDPLoggerRelay
+        MaxNotPingTimeSecs=30
+        RelayServerPort=44444
+	MaxHistoryQueueMessages=2500
+    }
+}
++WEBROOT={
+    Class = HttpGroupResource
+    +LISTFILES = {
+         Class = HttpDirectoryResource
+         BaseDir = /tmp/
+         FileFilter = *.html
+    }
+    +APPLET = {
+         Class = HttpDirectoryResource
+         BaseDir = html
+         StartHtml = applet
+    }
+    AddReference = {
+         UDP_RELAY_SERVER
+    }
+    +LIST_CLASS = {
+	 Class = HttpClassListResource
+    }
+}
++HTTPSERVER = {
+    Class = HttpService
+    Port=8083
+    VerboseLevel=10
+    Root=WEBROOT
+};
