@@ -339,10 +339,6 @@ if [ $nargs -ge 2 ]; then
 	compileModules $target 1 $makeMode "Interfaces-TimeServiceActivities"
 	echo "Interfaces Time Service Activities compilation finished"
 
-	cd $basedir
-        cd "3rdPartyLibs"
-        extractFiles
-        
 	echo ""
 	echo "*************************Compilation Finished*************************"
 	echo ""
