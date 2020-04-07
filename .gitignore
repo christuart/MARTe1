@@ -1,3 +1,10 @@
 *.err
+*.swp
 *depends*.*
-*/linux/*
+*.sinfo.cpp
+**/linux/*
+**/temp/*
+3rdPartyLibs/*/
+Interfaces/Logger/JTLogger/JTLogger.jar
+Interfaces/Logger/JTLogger/build/
+Interfaces/Logger/JTLogger/file.compile.list
