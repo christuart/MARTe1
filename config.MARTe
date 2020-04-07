@@ -58,6 +58,6 @@ MATLABHandler
 SignalHandler
 JTLogger
 #EPICSLib
-#RelayLogger
+RelayLogger
 MessageTriggeringTimeService
 
