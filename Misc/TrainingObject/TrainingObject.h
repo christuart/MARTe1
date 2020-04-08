@@ -32,17 +32,32 @@
 
 #include "GCNamedObject.h"
 #include "HttpInterface.h"
+#include "MessageHandler.h"
+
+/**
+ * An enumeration for HelloWorld to understand day vs night
+ */
+enum TrainingObjectEarthRotationStatus {
+    UNKNOWN_EARTH_ROTATION_STATUS,
+    DAYTIME,
+    NIGHTTIME
+};
 
 /**
  * A HelloWorld object
  */
 OBJECT_DLL(TrainingObject)
-class TrainingObject : public GCNamedObject, public HttpInterface {
+class TrainingObject : public GCNamedObject, public HttpInterface, public MessageHandler {
 OBJECT_DLL_STUFF(TrainingObject)
+
+private:
+    /** States */
+    TrainingObjectEarthRotationStatus dayOrNight;
 
 public:
     /** Constructor */
     TrainingObject(){
+        dayOrNight = UNKNOWN_EARTH_ROTATION_STATUS;
     }
 
     /** Destructor */
@@ -51,6 +66,9 @@ public:
 
     /** Loads object parameters from a CDB */
     virtual bool ObjectLoadSetup(ConfigurationDataBase &cdbData, StreamInterface *err);
+
+    /** The MARTe message handling routine */
+    virtual bool ProcessMessage(GCRTemplate<MessageEnvelope> envelope);
 
     /** Responds to HTTP requests */
     bool ProcessHttpMessage(HttpStream &hStream);

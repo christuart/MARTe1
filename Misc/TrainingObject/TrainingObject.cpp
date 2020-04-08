@@ -39,10 +39,35 @@ bool TrainingObject::ObjectLoadSetup(ConfigurationDataBase &cdbData, StreamInter
 
 }
 
+bool TrainingObject::ProcessMessage(GCRTemplate<MessageEnvelope> envelope) {
+    AssertErrorCondition(Information, "ProcessMessage %s: Received Message from %s: ", Name(), envelope->Sender());
+    GCRTemplate<Message> message = envelope->GetMessage();
+    if (message.IsValid()){
+        FString messageContent = message->Content();
+        if (messageContent == "SUN_IS_SETTING") {
+            dayOrNight = NIGHTTIME;
+        } else if (messageContent == "SUN_IS_RISING") {
+            dayOrNight = DAYTIME;
+        } else {
+            dayOrNight = UNKNOWN_EARTH_ROTATION_STATUS;
+        }
+    }
+    return True;
+}
+
 bool TrainingObject::ProcessHttpMessage(HttpStream &hStream) {
     hStream.SSPrintf("OutputHttpOtions.Content-Type","text/html");
     hStream.Printf("<html><head><title>TrainingObject</title><head><body>\n");
-    hStream.Printf("<p>Hello World!</p>\n");
+    switch (dayOrNight) {
+        case DAYTIME:
+            hStream.Printf("<p>Hello World, what a wonderful day!</p>\n");
+            break;
+        case NIGHTTIME:
+            hStream.Printf("<p>Hello World, what a wonderful night!</p>\n");
+            break;
+        case UNKNOWN_EARTH_ROTATION_STATUS:
+            hStream.Printf("<p>Hello World, wherever you may be!</p>\n");
+    }
     hStream.Printf("</body></html>");        
     hStream.WriteReplyHeader(True);
     return True;
