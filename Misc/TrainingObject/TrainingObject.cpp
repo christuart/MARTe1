@@ -39,4 +39,13 @@ bool TrainingObject::ObjectLoadSetup(ConfigurationDataBase &cdbData, StreamInter
 
 }
 
+bool TrainingObject::ProcessHttpMessage(HttpStream &hStream) {
+    hStream.SSPrintf("OutputHttpOtions.Content-Type","text/html");
+    hStream.Printf("<html><head><title>TrainingObject</title><head><body>\n");
+    hStream.Printf("<p>Hello World!</p>\n");
+    hStream.Printf("</body></html>");        
+    hStream.WriteReplyHeader(True);
+    return True;
+}
+
 OBJECTLOADREGISTER(TrainingObject, "$Id$")

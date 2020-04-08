@@ -31,12 +31,13 @@
 #define TRAINING_OBJECT_H_
 
 #include "GCNamedObject.h"
+#include "HttpInterface.h"
 
 /**
  * A HelloWorld object
  */
 OBJECT_DLL(TrainingObject)
-class TrainingObject : public GCNamedObject {
+class TrainingObject : public GCNamedObject, public HttpInterface {
 OBJECT_DLL_STUFF(TrainingObject)
 
 public:
@@ -48,9 +49,11 @@ public:
     ~TrainingObject(){
     }
 
-   /** Loads object parameters from a CDB */
+    /** Loads object parameters from a CDB */
     virtual bool ObjectLoadSetup(ConfigurationDataBase &cdbData, StreamInterface *err);
 
+    /** Responds to HTTP requests */
+    bool ProcessHttpMessage(HttpStream &hStream);
 };
 
 #endif /* TRAINING_OBJECT_H_ */
