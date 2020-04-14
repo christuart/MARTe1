@@ -33,8 +33,11 @@
 bool TrainingObject::ObjectLoadSetup(ConfigurationDataBase &cdbData, StreamInterface *err){
 
     // load name of object
-    bool ret = this->GCNamedObject::ObjectLoadSetup(cdbData, err);
-    this->AssertErrorCondition(Information, "Hello World! Greetings from %s", this->Name());
+    
+
+    // hello world
+    
+
     return ret;
 
 }
