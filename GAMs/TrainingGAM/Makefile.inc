@@ -22,6 +22,8 @@
 # $Id$
 #
 #############################################################
+OBJSX=TrainingGAMClassInfo.sinfo.x
+
 MAKEDEFAULTDIR=../../MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
@@ -37,6 +39,7 @@ CFLAGS+= -I../../BaseLib2/Level6
 CFLAGS+= -I../../BaseLib2/LoggerService
 
 all: $(OBJS) \
+    TrainingGAMClassInfo.sinfo.cpp\
     $(TARGET)/TrainingGAM$(GAMEXT)
 
 include depends.$(TARGET)
