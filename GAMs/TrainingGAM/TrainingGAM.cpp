@@ -46,18 +46,25 @@ bool TrainingGAM::Initialise(ConfigurationDataBase& cdbData) {
 bool TrainingGAM::Execute(GAM_FunctionNumbers functionNumber) {
     switch (functionNumber) {
         case GAMPrepulse:
+            // At the start of a pulse, reset the sums to zero
             intSum = 0;
             floatSum = 0.0f;
             break;
         case GAMOnline:
+            // Each cycle we will add to our sums
             intSum += intToAdd;
             floatSum += floatToAdd;
-            float *productOfSums = new float;
-            *productOfSums = (float)intSum * floatSum;
+            
+            // Then we will calculate the product of the new sums
+            float productOfSums = (float)intSum * floatSum;
+            
+            // Finally we will output this to our OutputInterface
             float *outputBuffer = reinterpret_cast<float*>(output->Buffer());
-            *outputBuffer = *productOfSums;
+            outputBuffer[0] = productOfSums;
             break;
     }
+
+    // At the end of each function we send the output buffer out
     output->Write();
 
     return True;
