@@ -4,6 +4,7 @@
  */
 
 #include "TrainingGAM.h"
+#include "DDBOutputInterface.h"
 
 bool TrainingGAM::Initialise(ConfigurationDataBase& cdbData) {
     // Read in our integer to add
@@ -11,6 +12,33 @@ bool TrainingGAM::Initialise(ConfigurationDataBase& cdbData) {
 
     // Read in our float to add
     floatToAdd = 2.721828;
+
+    ////////////////////////////////////////////////////
+    //                Add interfaces to DDB           //
+    ////////////////////////////////////////////////////
+    if (!AddOutputInterface(output, "OutputInterface")) {
+        AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: failed to add output interface", Name());
+        return False;
+    }
+
+    CDBExtended cdb(cdbData);
+
+    ////////////////////////////////////////////////////
+    //                Add output signals              //
+    ////////////////////////////////////////////////////
+    if (!cdb->Move("OutputSignals")) {
+        AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: did not specify OutputSignals entry",Name());
+        return False;
+    }
+    if (!output->ObjectLoadSetup(cdb,NULL)) {
+        AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: ObjectLoadSetup Failed DDBInterface %s ",Name(),output->InterfaceName());
+        return False;
+    }
+    uint32 nOfSignals = cdb->NumberOfChildren();
+    if(nOfSignals != 1){
+        AssertErrorCondition(Warning,"TrainingGAM %s::Initialise: ObjectLoadSetup. Only the product of the two sums is going to be given as output of this GAM ",Name());
+    }
+    cdb->MoveToFather();
 
     return True;
 }
@@ -24,8 +52,14 @@ bool TrainingGAM::Execute(GAM_FunctionNumbers functionNumber) {
         case GAMOnline:
             intSum += intToAdd;
             floatSum += floatToAdd;
+            float *productOfSums = new float;
+            *productOfSums = (float)intSum * floatSum;
+            float *outputBuffer = reinterpret_cast<float*>(output->Buffer());
+            *outputBuffer = *productOfSums;
             break;
     }
+    output->Write();
+
     return True;
 }
 
