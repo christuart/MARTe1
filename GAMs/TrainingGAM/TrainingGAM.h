@@ -13,14 +13,12 @@ class TrainingGAM : public GAM, public HttpInterface {
 OBJECT_DLL_STUFF(TrainingGAM)
 private:
     /** DDB Interfaces **/
+    /* Input interface */
+    DDBInputInterface *input;
     /* Output interface */
     DDBOutputInterface *output;
 
     /** Parameters **/
-    /* What integer number to add */
-    int32 intToAdd;
-    /* What float number to add */
-    float floatToAdd;
 
     /** State **/
     /* The stored sum of integers */
@@ -31,6 +29,7 @@ private:
 public:
     /* Constructor */
     TrainingGAM() {
+        input = NULL;
         output = NULL;
 
         intSum = 0;

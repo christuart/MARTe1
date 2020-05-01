@@ -4,24 +4,40 @@
  */
 
 #include "TrainingGAM.h"
+#include "DDBInputInterface.h"
 #include "DDBOutputInterface.h"
 
 bool TrainingGAM::Initialise(ConfigurationDataBase& cdbData) {
-    // Read in our integer to add
-    intToAdd = 3;
-
-    // Read in our float to add
-    floatToAdd = 2.721828;
-
     ////////////////////////////////////////////////////
     //                Add interfaces to DDB           //
     ////////////////////////////////////////////////////
+    if (!AddInputInterface(input, "InputInterface")) {
+        AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: failed to add input interface", Name());
+        return False;
+    }
     if (!AddOutputInterface(output, "OutputInterface")) {
         AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: failed to add output interface", Name());
         return False;
     }
 
     CDBExtended cdb(cdbData);
+
+    ////////////////////////////////////////////////////
+    //                Add input signals               //
+    ////////////////////////////////////////////////////
+    if (!cdb->Move("InputSignals")) {
+        AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: did not specify InputSignals entry",Name());
+        return False;
+    }
+    if (!input->ObjectLoadSetup(cdb,NULL)) {
+        AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: ObjectLoadSetup Failed DDBInterface %s ",Name(),input->InterfaceName());
+        return False;
+    }
+    uint32 nOfSignals = cdb->NumberOfChildren();
+    if(nOfSignals != 2){
+        AssertErrorCondition(Warning,"TrainingGAM %s::Initialise: ObjectLoadSetup. Exactly 1 integer and 1 float are expected to be given as input of this GAM ",Name());
+    }
+    cdb->MoveToFather();
 
     ////////////////////////////////////////////////////
     //                Add output signals              //
@@ -34,7 +50,7 @@ bool TrainingGAM::Initialise(ConfigurationDataBase& cdbData) {
         AssertErrorCondition(InitialisationError,"TrainingGAM %s::Initialise: ObjectLoadSetup Failed DDBInterface %s ",Name(),output->InterfaceName());
         return False;
     }
-    uint32 nOfSignals = cdb->NumberOfChildren();
+    nOfSignals = cdb->NumberOfChildren();
     if(nOfSignals != 1){
         AssertErrorCondition(Warning,"TrainingGAM %s::Initialise: ObjectLoadSetup. Only the product of the two sums is going to be given as output of this GAM ",Name());
     }
@@ -44,6 +60,9 @@ bool TrainingGAM::Initialise(ConfigurationDataBase& cdbData) {
 }
 
 bool TrainingGAM::Execute(GAM_FunctionNumbers functionNumber) {
+    // At the beginning of each function we collect input data
+    input->Read();
+
     switch (functionNumber) {
         case GAMPrepulse:
             // At the start of a pulse, reset the sums to zero
@@ -51,9 +70,17 @@ bool TrainingGAM::Execute(GAM_FunctionNumbers functionNumber) {
             floatSum = 0.0f;
             break;
         case GAMOnline:
-            // Each cycle we will add to our sums
-            intSum += intToAdd;
-            floatSum += floatToAdd;
+            // Each cycle we will add to our sums from the input
+            // First get the buffer from the DDBInputInterface
+            void *inputBuffer = reinterpret_cast<void *>(input->Buffer());
+            // Then read the first word in it as int32
+            int32 *intToAddBuffer = reinterpret_cast<int32 *>(inputBuffer);
+            // Then read the next word in it as float
+            float *floatToAddBuffer = reinterpret_cast<float *>(intToAddBuffer+1);
+            
+            // Now use these in the sums
+            intSum += intToAddBuffer[0];
+            floatSum += floatToAddBuffer[0];
             
             // Then we will calculate the product of the new sums
             float productOfSums = (float)intSum * floatSum;
